@@ -1,0 +1,64 @@
+version: '3'
+
+services:
+  ensmysql:
+    restart: always
+    image: mysql:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_PORT=3306
+      - MYSQL_USER=vinay
+      - MYSQL_PASSWORD=vinay
+    ports:
+      - "3306:3306"       
+    volumes:
+      - /home/vinay/Documents/Ensembl-Master/Projects/P7_QRP/mysqldata:/var/lib/mysql
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    environment:
+      - RABBITMQ_DEFAULT_USER=qrp
+      - RABBITMQ_DEFAULT_PASS=qrp
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - /home/vinay/Documents/Ensembl-Master/Projects/P7_QRP/data:/var/lib/rabbitmq:rw
+  
+  production:
+    build: './productionservices'
+    ports:
+      - "5000:5000"
+    volumes:    
+      - /home/vinay/Documents/Ensembl-Master/Projects/P7_QRP/productionservices/ensembl-prodinf-core:/app/ensembl-prodinf-core 
+      - /home/vinay/Documents/Ensembl-Master/Projects/P7_QRP/productionservices/ensembl-prodinf-srv:/app/ensembl-prodinf-srv  
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.10
+    container_name: elasticsearch
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - /home/vinay/Documents/Ensembl-Master/Projects/P7_QRP/elasticdata:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+  elasticsearch2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.10
+    container_name: elasticsearch2
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.zen.ping.unicast.hosts=elasticsearch"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - /home/vinay/Documents/Ensembl-Master/Projects/P7_QRP/elasticdata:/usr/share/elasticsearch/data

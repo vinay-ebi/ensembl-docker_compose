@@ -1,0 +1,27 @@
+ENS_VERSION=100
+init_pipeline.pl Bio::EnsEMBL::Production::Pipeline::PipeConfig::CoreStatistics_conf \
+  $(h1-w details hive) \
+  -registry /homes/ensprod/vinay_test/vinay.reg \
+  -species  anopheles_gambiae \
+  -skip_metadata_check 1 \
+  -pipeline_name test_qrp_vinay_core_stats_${ENS_VERSION} \
+  -pipeline_url mysql://ensadmin:ensembl@mysql-ens-hive-prod-1:4575/vinay_corestat_test_3_100_QRP \
+  -hive_force_init 1 \
+  -skip_metadata_check 1 
+
+
+
+
+        "PipelineName": "CoreStats",
+        "PipeConfig": "Bio::EnsEMBL::Production::Pipeline::PipeConfig::CoreStatistics_conf",
+        "PipeParams": {
+          "params":{
+            "-registry": "/homes/ensprod/vinay_test/vinay.reg",
+            "-species" : "anopheles_gambiae",
+            "-skip_metadata_check": 1,
+          },
+          "arguments":[],
+          "environ": {
+            "ENS": 101
+          }
+
