@@ -21,6 +21,19 @@ sudo docker run -it -v $(pwd)/ensembl-prodinf-core:/app/ensembl-prodinf-core -v 
 
 
 
+
+
+-start all services at once using docker compose
+------------------
+
+stop local mysql server : sudo service mysql stop
+stop local rabbitmq server : sudo rabbitmqctl stop
+
+
+-create directores in side repo dir for persistance mysql and rabbitmq data storage
+-----------
+mkdir mysqldata data
+
 -copy ssh keys
 ----
 
@@ -41,3 +54,15 @@ set below mentioned values accoringly for ur usage in  file ensembl-prodinf-core
 -docker-compose:
 ----
 docker-compose up --build
+
+
+
+-Apps urls:
+----------
+
+- Rabbitmq: localhost:15672
+- elasticsearch: localhost:9400
+- production srv: localhost:500
+- mysql: localhost:3306
+- celery flower: localhost:5555 (two celery workers will be started for monitor and qrp queues)
+ 

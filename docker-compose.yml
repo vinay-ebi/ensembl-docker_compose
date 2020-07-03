@@ -14,21 +14,20 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - /home/vinay/Documents/Ensembl-Master/Projects/P7_QRP/mysqldata:/var/lib/mysql
+      - "./mysqldata:/var/lib/mysql"
     networks:
       - productionsrv 
 
   rabbitmq:
     container_name: 'ensrabbitmq'
     image: rabbitmq:3-management-alpine
-    environment:
-      - RABBITMQ_DEFAULT_USER=qrp
-      - RABBITMQ_DEFAULT_PASS=qrp
     ports:
       - "5672:5672"
       - "15672:15672"
     volumes:
-      - /home/vinay/Documents/Ensembl-Master/Projects/P7_QRP/data:/var/lib/rabbitmq:rw
+      - "./data:/var/lib/rabbitmq:rw"
+      - "./qrp_ensdev.json:/opt/definitions.json:rw" 
+      - "./rabbitmq.config:/etc/rabbitmq/rabbitmq.conf"  
     networks:
       - productionsrv      
 
@@ -38,8 +37,8 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - /home/vinay/Documents/Ensembl-Master/Projects/P7_QRP/productionservices/ensembl-prodinf-core:/app/ensembl-prodinf-core
-      - /home/vinay/Documents/Ensembl-Master/Projects/P7_QRP/productionservices/ensembl-prodinf-srv:/app/ensembl-prodinf-srv
+      - ./productionservices/ensembl-prodinf-core:/app/ensembl-prodinf-core
+      - ./productionservices/ensembl-prodinf-srv:/app/ensembl-prodinf-srv
     networks:
       - productionsrv 
     links:
@@ -54,8 +53,8 @@ services:
     container_name: 'celery-monitor'
     command: "celery -A ensembl_prodinf.event_tasks worker -l info -Q qrp -n qrp-handover@%%h"
     volumes:
-      - /home/vinay/Documents/Ensembl-Master/Projects/P7_QRP/productionservices/ensembl-prodinf-core:/app/ensembl-prodinf-core
-      - /home/vinay/Documents/Ensembl-Master/Projects/P7_QRP/productionservices/ensembl-prodinf-srv:/app/ensembl-prodinf-srv
+      - "./productionservices/ensembl-prodinf-core:/app/ensembl-prodinf-core"
+      - "./productionservices/ensembl-prodinf-srv:/app/ensembl-prodinf-srv"
     networks:
       - productionsrv
         
@@ -68,8 +67,8 @@ services:
     container_name: 'celery-process'
     command: "celery -A ensembl_prodinf.event_tasks worker -l info -Q monitor -n monitor-handover@%%h"
     volumes:
-      - /home/vinay/Documents/Ensembl-Master/Projects/P7_QRP/productionservices/ensembl-prodinf-core:/app/ensembl-prodinf-core
-      - /home/vinay/Documents/Ensembl-Master/Projects/P7_QRP/productionservices/ensembl-prodinf-srv:/app/ensembl-prodinf-srv
+      - ./productionservices/ensembl-prodinf-core:/app/ensembl-prodinf-core
+      - ./productionservices/ensembl-prodinf-srv:/app/ensembl-prodinf-srv
     networks:
       - productionsrv
         
@@ -86,8 +85,8 @@ services:
     ports:
       - "5555:5555"      
     volumes:
-      - /home/vinay/Documents/Ensembl-Master/Projects/P7_QRP/productionservices/ensembl-prodinf-core:/app/ensembl-prodinf-core
-      - /home/vinay/Documents/Ensembl-Master/Projects/P7_QRP/productionservices/ensembl-prodinf-srv:/app/ensembl-prodinf-srv
+      - ./productionservices/ensembl-prodinf-core:/app/ensembl-prodinf-core
+      - ./productionservices/ensembl-prodinf-srv:/app/ensembl-prodinf-srv
     networks:
       - productionsrv
         
