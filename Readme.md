@@ -37,7 +37,7 @@ mkdir mysqldata data
 -copy ssh keys
 ----
 
-copy files  id_rsa  id_rsa.pub  known_hosts from ~/.ssh into folder application productionservices/ssh which will be  used my radical saga to launch pipeline into farm
+copy files  id_rsa,  id_rsa.pub and known_hosts from ~/.ssh into application folder  productionservices/ssh which will be  used by radical saga to launch pipeline into farm
 
 
 -set user name for radical saga 
