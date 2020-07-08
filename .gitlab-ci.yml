@@ -1,14 +1,42 @@
-image: docker:latest
+image: ubuntu:18.04
 
-services:
-  - docker:dind
-
-before_script:
-  - docker info
+stages:
+  - build
+  - test
+  - deploy  
 
 build:
   stage: build
   tag: ci
   script:
-    - docker ps -a
+    - echo "building stage1 image....."
 
+buildstage2:
+  stage: build
+  tag: ci
+  script:
+    - echo "building stage2 image..."
+
+test-dev:
+  stage: test
+  tag: ci
+  script:
+    - echo "testing 1......"
+
+test-staging: 
+  stage: test
+  tag: ci
+  script:
+    - echo "testing 2....." 
+
+deploy-dev:
+  stage: deploy
+  tag: ci
+  script:
+    - echo "deploying ensembl production services to dev"      
+  
+deploy-prod:
+  stage: deploy
+  tag: ci
+  script:
+    - echo "deploying ensembl production services to production"      
