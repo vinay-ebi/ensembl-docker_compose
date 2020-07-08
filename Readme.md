@@ -55,6 +55,9 @@ set below mentioned values accoringly for ur usage in  file ensembl-prodinf-core
 ----
 docker-compose up --build
 
+-deploy into local kubernetes :
+-------------------------------
+kompose up --push-image=false   (this flag avoid to push image to remote dockerhub repos)
 
 
 -Apps urls:
@@ -66,3 +69,6 @@ docker-compose up --build
 - mysql: localhost:3306
 - celery flower: localhost:5555 (two celery workers will be started for monitor and qrp queues)
  
+
+
+

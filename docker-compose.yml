@@ -72,7 +72,7 @@ services:
     networks:
       - productionsrv
         
-  celery-flower:
+  celery-flower-ensembl:
     depends_on:
       - rabbitmq
       - celery-monitor 
