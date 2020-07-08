@@ -7,36 +7,30 @@ stages:
 
 build:
   stage: build
-  tag: ci
   script:
     - echo "building stage1 image....."
 
 buildstage2:
   stage: build
-  tag: ci
   script:
     - echo "building stage2 image..."
 
 test-dev:
   stage: test
-  tag: ci
   script:
     - echo "testing 1......"
 
 test-staging: 
   stage: test
-  tag: ci
   script:
     - echo "testing 2....." 
 
 deploy-dev:
   stage: deploy
-  tag: ci
   script:
     - echo "deploying ensembl production services to dev"      
   
 deploy-prod:
   stage: deploy
-  tag: ci
   script:
     - echo "deploying ensembl production services to production"      
