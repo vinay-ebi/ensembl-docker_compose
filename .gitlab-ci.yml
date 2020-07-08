@@ -8,6 +8,7 @@ before_script:
 
 build:
   stage: build
+  tag: ci
   script:
     - docker ps -a
 
