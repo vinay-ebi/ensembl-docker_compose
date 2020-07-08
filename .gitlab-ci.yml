@@ -26,6 +26,3 @@ deploy-dev:
   script:
     - echo "deploying ensembl production services to dev"      
   when: manual
-    only:
-      roles:
-        - maintainers
