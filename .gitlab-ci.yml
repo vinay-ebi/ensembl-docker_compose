@@ -9,27 +9,20 @@ build:
   script:
     - echo "building stage1 image....."
 
-buildstage2:
-  stage: build
-  script:
-    - echo "building stage2 image..."
 
-test-dev:
+test-dev-1:
   stage: test
   script:
     - echo "testing 1......"
 
-test-staging: 
+test-dev-2:
   stage: test
   script:
-    - echo "testing 2....." 
+    - echo "testing 1......"
+      
 
 deploy-dev:
   stage: deploy
   script:
     - echo "deploying ensembl production services to dev"      
   
-deploy-prod:
-  stage: deploy
-  script:
-    - echo "deploying ensembl production services to production"      
