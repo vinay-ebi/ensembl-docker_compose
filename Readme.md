@@ -26,8 +26,13 @@ sudo docker run -it -v $(pwd)/ensembl-prodinf-core:/app/ensembl-prodinf-core -v 
 -start all services at once using docker compose
 ------------------
 
-stop local mysql server : sudo service mysql stop
+stop local mysql server : sudo service mysql stop ;
+
 stop local rabbitmq server : sudo rabbitmqctl stop
+
+-elstic search fails with error : max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]
+--------------
+sudo sysctl -w vm.max_map_count=262144
 
 
 -create directores in side repo dir for persistance mysql and rabbitmq data storage
