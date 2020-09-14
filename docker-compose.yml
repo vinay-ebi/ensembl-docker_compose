@@ -1,9 +1,167 @@
 version: '3'
-services:
-  web:
-    build: .
-    ports:
-      - "5031:5000"
-  redis:
-    image: "redis:alpine"
 
+services:
+
+  ensmysql:
+    restart: always
+    container_name: 'ensmysql'
+    image: mysql:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_PORT=3306
+      - MYSQL_USER=vinay
+      - MYSQL_PASSWORD=vinay
+    ports:
+      - "3306:3306"
+    volumes:
+      - "./mysqldata:/var/lib/mysql"
+    networks:
+      - productionsrv 
+
+  rabbitmq:
+    container_name: 'ensrabbitmq'
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - "./data:/var/lib/rabbitmq:rw"
+      - "./qrp_ensdev.json:/opt/definitions.json:rw" 
+      - "./rabbitmq.config:/etc/rabbitmq/rabbitmq.conf"  
+    networks:
+      - productionsrv      
+
+  production:
+    build: './productionservices'
+    container_name: 'production'
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./productionservices/ensembl-prodinf-core:/app/ensembl-prodinf-core
+      - ./productionservices/ensembl-prodinf-srv:/app/ensembl-prodinf-srv
+    networks:
+      - productionsrv 
+    links:
+      - es01      
+
+  celery-monitor:
+    depends_on:
+      - rabbitmq 
+    build:
+      context: ./productionservices
+      dockerfile: Dockerfile.celery
+    container_name: 'celery-monitor'
+    command: "celery -A ensembl_prodinf.event_tasks worker -l info -Q qrp -n qrp-handover@%%h"
+    volumes:
+      - "./productionservices/ensembl-prodinf-core:/app/ensembl-prodinf-core"
+      - "./productionservices/ensembl-prodinf-srv:/app/ensembl-prodinf-srv"
+    networks:
+      - productionsrv
+        
+  celery-process:
+    depends_on:
+      - rabbitmq
+    build:
+      context: ./productionservices
+      dockerfile: Dockerfile.celery
+    container_name: 'celery-process'
+    command: "celery -A ensembl_prodinf.event_tasks worker -l info -Q monitor -n monitor-handover@%%h"
+    volumes:
+      - ./productionservices/ensembl-prodinf-core:/app/ensembl-prodinf-core
+      - ./productionservices/ensembl-prodinf-srv:/app/ensembl-prodinf-srv
+    networks:
+      - productionsrv
+        
+  celery-flower-ensembl:
+    depends_on:
+      - rabbitmq
+      - celery-monitor 
+      - celery-process  
+    build:
+      context: ./productionservices
+      dockerfile: Dockerfile.celery
+    container_name: 'celery-flower'
+    command: "flower -A ensembl_prodinf.event_tasks --port=5555"
+    ports:
+      - "5555:5555"      
+    volumes:
+      - ./productionservices/ensembl-prodinf-core:/app/ensembl-prodinf-core
+      - ./productionservices/ensembl-prodinf-srv:/app/ensembl-prodinf-srv
+    networks:
+      - productionsrv
+        
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.1
+    container_name: es01
+    environment:
+      - http.port=9400
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es04,es03
+      - cluster.initial_master_nodes=es01,es04,es03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data01:/usr/share/elasticsearch/data
+    ports:
+      - 9400:9400
+    networks:
+      - productionsrv
+  es04:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.1
+    container_name: es04
+    environment:
+      - node.name=es04
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es01,es03
+      - cluster.initial_master_nodes=es01,es04,es03
+      - node.data=false
+      - node.master=true
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    #volumes:
+    #  - data02:/usr/share/elasticsearch/data
+    networks:
+      - productionsrv
+  es03:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.1
+    container_name: es03
+    environment:
+      - node.name=es03
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es01,es04
+      - cluster.initial_master_nodes=es01,es04,es03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data03:/usr/share/elasticsearch/data
+    networks:
+      - productionsrv
+
+volumes:
+  data01:
+    driver: local
+  data02:
+    driver: local
+  data03:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge
+  productionsrv:
+    driver: bridge      
+
+        
