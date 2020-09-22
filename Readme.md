@@ -60,6 +60,10 @@ set below mentioned values accoringly for ur usage in  file ensembl-prodinf-core
 ----
 docker-compose up --build
 
+-set the index for elastic search :
+-----------------------------
+ curl -XPUT http://localhost:9400/pipelines
+
 -deploy into local kubernetes :
 -------------------------------
 kompose up --push-image=false   (this flag avoid to push image to remote dockerhub repos)
@@ -75,5 +79,29 @@ kompose up --push-image=false   (this flag avoid to push image to remote dockerh
 - celery flower: localhost:5555 (two celery workers will be started for monitor and qrp queues)
  
 
+-Payload:
+-----------
+```{
+  "spec": {
+    "handover_token": "test_handover_token_11",
+    "src_uri": "mysql://vinay:<set password>@ensprod-dev-01:3306/anopheles_gambiae_core_48_101_4",
+    "contact": "vinay@ebi.ac.uk",
+    "comment": "testing handover for qrp",
+    "hive_url": "mysql://vinay:<password>@<host>:3306/",
+    "user": "vinay",
+    "progress_complete": 3,
+    "progress_total": 3,
+    "EG_VERSION" : "100",
+    "ENS_VERSION": "100",
+    "staging_uri": "mysql://<user>:<password>@<host>:<port>/",
+    "tgt_uri": "mysql://<user>:<password>@<host>:<port>/anopheles_gambiae_core_48_101_4"
+  },
+  "event": {}
+}
+```
 
+-Check the results:
+-----------------
+- http://localhost:5000/qrp/jobs
+- http://localhost:5000/qrp/jobs?format=json
 
