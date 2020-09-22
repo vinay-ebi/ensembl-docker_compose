@@ -81,10 +81,12 @@ kompose up --push-image=false   (this flag avoid to push image to remote dockerh
 
 -Payload:
 -----------
+- http://localhost:5000/qrp/submit/job
+
 ```{
   "spec": {
     "handover_token": "test_handover_token_11",
-    "src_uri": "mysql://vinay:<set password>@ensprod-dev-01:3306/anopheles_gambiae_core_48_101_4",
+    "src_uri": "mysql://vinay:<set password>@<host>:<port>/anopheles_gambiae_core_48_101_4",
     "contact": "vinay@ebi.ac.uk",
     "comment": "testing handover for qrp",
     "hive_url": "mysql://vinay:<password>@<host>:3306/",
